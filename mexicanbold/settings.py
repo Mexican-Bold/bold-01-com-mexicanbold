@@ -23,14 +23,15 @@ except:
 
 env = environ.Env(
     # set casting, default value
-    DEBUG=(bool, False)
+#    DEBUG=(bool, False)
 )
 
 
 # Set the project base directory
-BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-# Build paths inside the project like this: BASE_DIR / 'subdir'.
-#BASE_DIR = Path(__file__).resolve().parent.parent
+#BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+#Build paths inside the project like this: BASE_DIR / 'subdir'.
+BASE_DIR = Path(__file__).resolve().parent.parent
+
 
 # Take environment variables from .env file
 environ.Env.read_env(os.path.join(BASE_DIR, '.env'))
@@ -129,6 +130,7 @@ MIDDLEWARE = [
     'django.contrib.flatpages.middleware.FlatpageFallbackMiddleware',
     'inertia.middleware.InertiaMiddleware',
     "whitenoise.middleware.WhiteNoiseMiddleware",
+    'blog',
 
 
 ]
@@ -160,15 +162,18 @@ WSGI_APPLICATION = 'mexicanbold.wsgi.application'
 
 # Database
 # https://docs.djangoproject.com/en/4.2/ref/settings/#databases
-
+#DATABASES = {
+#    # read os.environ['DATABASE_URL']
+#    'default': env.db()  # <-- Updated!
+#}
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql',
-        'NAME': 'mexicanbold',
-        'USER': 'mexicanbolduser',
-        'PASSWORD': 'admin',
-        'HOST': 'localhost' ,
-        'PORT': '5432',
+        'NAME': os.environ.get('DB_NAME'),
+        'USER': os.environ.get('DB_USER'),
+        'PASSWORD': os.environ.get('DB_PASSWORD'),
+        'HOST': os.environ.get('DB_HOST'),
+        'PORT': os.environ.get('DB_PORT'),
 
     }
 }
