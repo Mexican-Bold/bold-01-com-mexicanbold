@@ -96,6 +96,7 @@ INSTALLED_APPS = [
     'oscar.apps.dashboard.vouchers.apps.VouchersDashboardConfig',
     'oscar.apps.dashboard.communications.apps.CommunicationsDashboardConfig',
     'oscar.apps.dashboard.shipping.apps.ShippingDashboardConfig',
+    'blog',
 
 # 3rd-party apps that oscar depends on
     'widget_tweaks',
@@ -129,8 +130,6 @@ MIDDLEWARE = [
 	'oscar.apps.basket.middleware.BasketMiddleware',
     'django.contrib.flatpages.middleware.FlatpageFallbackMiddleware',
     'inertia.middleware.InertiaMiddleware',
-    "whitenoise.middleware.WhiteNoiseMiddleware",
-    'blog',
 
 
 ]
@@ -175,6 +174,7 @@ DATABASES = {
         'HOST': os.environ.get('DB_HOST'),
         'PORT': os.environ.get('DB_PORT'),
 
+
     }
 }
 
@@ -211,10 +211,35 @@ USE_TZ = True
 
 
 # Static files (CSS, JavaScript, Images)
-# https://docs.djangoproject.com/en/4.2/howto/static-files/
+# https://docs.djangoproject.com/en/5.1/howto/static-files/
 
-STATIC_URL = 'static/'
+STATIC_URL = "static/"
 
+CLOUDFLARE_R2_BUCKET=config("CLOUDFLARE_R2_BUCKET", cast=str, default='django')
+CLOUDFLARE_R2_ACCESS_KEY=config("CLOUDFLARE_R2_ACCESS_KEY")
+CLOUDFLARE_R2_SECRET_KEY=config("CLOUDFLARE_R2_SECRET_KEY")
+CLOUDFLARE_R2_BUCKET_ENDPOINT=config("CLOUDFLARE_R2_BUCKET_ENDPOINT")
+
+CLOUDFLARE_R2_CONFIG_OPTIONS = {
+    "bucket_name": CLOUDFLARE_R2_BUCKET,
+    "access_key": CLOUDFLARE_R2_ACCESS_KEY,
+    "secret_key": CLOUDFLARE_R2_SECRET_KEY,
+    "endpoint_url": CLOUDFLARE_R2_BUCKET_ENDPOINT,
+    "default_acl": "public-read", 
+    "signature_version": "s3v4",
+}
+
+STORAGES =  {
+    "default": {
+        "BACKEND": "helpers.cloudflare.storages.MediaFileStorage", 
+        "OPTIONS": CLOUDFLARE_R2_CONFIG_OPTIONS 
+    },
+    "staticfiles": {
+        "BACKEND": "helpers.cloudflare.storages.StaticFileStorage", 
+        "OPTIONS": CLOUDFLARE_R2_CONFIG_OPTIONS 
+    },
+}
+ 
 # Default primary key field type
 # https://docs.djangoproject.com/en/4.2/ref/settings/#default-auto-field
 
